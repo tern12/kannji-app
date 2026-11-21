@@ -73,9 +73,12 @@
 
   /* 読み・例文 */
   h2 { font-size: 16px; margin: 24px 0 8px; padding-bottom: 4px; border-bottom: 1px solid #ddd; }
-  .yomi-row { margin: 8px 0; line-height: 2; }
-  .yomi { font-weight: bold; margin-right: 12px; }
-  .word { display: inline-block; margin-right: 16px; }
+  .yomi-row { display: flex; align-items: baseline; margin: 14px 0; line-height: 2; }
+  .yomi-row .tag { flex: none; width: 36px; margin-right: 0; }  /* 番号。読みの左端がそろうように幅を決める */
+  .yomi-body { flex: 1; min-width: 0; }                         /* 読み(1行目)と単語(2行目)。幅が足りないと単語は折り返す */
+  .yomi { font-weight: bold; }
+  .words { margin-top: 2px; }
+  .word, .forms { display: inline-block; margin-right: 16px; }
   .tr { color: #666; font-size: 14px; }
   .oku { color: #d9534f; }                           /* 送り仮名の色 */
   .sentence { margin: 12px 0; }
@@ -155,8 +158,9 @@
 //   yomi : 一覧と画面2のいちばん上に出す読み
 //   mean : 意味(ja 日本語 / en 英語 / es スペイン語)
 //   on   : 音読み。words は例の言葉
-//   kun  : 訓読み。yomi と forms の [ ] の中が送り仮名(色が変わる)。
-//          words は例の言葉(音読みの words と同じ形。なくてもよい)
+//   kun  : 訓読み。yomi の [ ] の中が送り仮名(赤くなる)。forms の [ ] は位置を示すだけで、表示では黒。
+//          words は例の言葉(音読みの words と同じ形。なくてもよい)。
+//          送り仮名がない読み(forms に [ ] がない)は、words があれば forms は出さない
 //   ex   : 例文。{漢字|ふりがな} と書くと、漢字の上にふりがなが付く
 //
 //   例文は今は見本の3字(行・飲・病)だけ。ほかは 3.4 で入れる
@@ -811,20 +815,31 @@ function renderReadings(item) {
     return html;
   }
 
+  // 1行目に「番号+読み」、2行目に単語(読みの左端にそろえる)
+  function readingRowHtml(label, yomiHtml, secondLineHtml) {
+    return '<div class="yomi-row"><span class="tag">' + label + '</span>' +
+           '<div class="yomi-body"><div class="yomi">' + yomiHtml + '</div>' +
+           (secondLineHtml ? '<div class="words">' + secondLineHtml + '</div>' : '') +
+           '</div></div>';
+  }
+
   // 音読みと例の言葉。見出し(コウ など)に「音1」「音2」を付ける(漢字ごとに1から)
   let onHtml = "";
   item.on.forEach(function (on, i) {
-    onHtml += '<div class="yomi-row"><span class="tag">音' + (i + 1) + '</span>' +
-              '<span class="yomi">' + escapeHtml(on.yomi) + '</span>' + wordsHtml(on.words) + '</div>';
+    onHtml += readingRowHtml("音" + (i + 1), escapeHtml(on.yomi), wordsHtml(on.words));
   });
   $("on-list").innerHTML = onHtml || '<div class="empty">' + t.none + '</div>';
 
-  // 訓読み(読みも漢字側も送り仮名に色)。見出しに「訓1」「訓2」を付ける
+  // 訓読み。見出しに「訓1」「訓2」を付ける。赤くするのは読み(1行目)の送り仮名だけ
   let kunHtml = "";
   item.kun.forEach(function (kun, i) {
-    kunHtml += '<div class="yomi-row"><span class="tag">訓' + (i + 1) + '</span>' +
-               '<span class="yomi">' + toOkurigana(kun.yomi) + '</span>' +
-               toOkurigana(kun.forms) + wordsHtml(kun.words || []) + '</div>';
+    const words = kun.words || [];
+    const hasOkurigana = kun.forms.indexOf("[") >= 0;
+    // 送り仮名がなくて単語があるときは、漢字1字(野 など)は出さず、単語だけを出す
+    const formsHtml = (hasOkurigana || words.length === 0)
+      ? '<span class="forms">' + escapeHtml(kun.forms.replace(/[\[\]]/g, "")) + '</span>'
+      : "";
+    kunHtml += readingRowHtml("訓" + (i + 1), toOkurigana(kun.yomi), formsHtml + wordsHtml(words));
   });
   $("kun-list").innerHTML = kunHtml || '<div class="empty">' + t.none + '</div>';
 
