@@ -185,9 +185,17 @@ const KANJI = [
   {
     k: "食", yomi: "たべる・ショク",
     mean: { ja: "たべる。たべもの", en: "eat; food", es: "comer; comida" },
-    on: [ { yomi: "ショク", words: [] } ],
+    on: [
+      { yomi: "ショク", words: [
+        { w: "{食事|しょくじ}", en: "meal", es: "comida" },
+        { w: "{食堂|しょくどう}", en: "cafeteria", es: "comedor" },
+      ] },
+    ],
     kun: [ { yomi: "たべる", forms: "食[べる]・食[べます]" } ],
-    ex: [],
+    ex: [
+      { ja: "{薬|くすり}は{食後|しょくご}に{飲|の}みます。", en: "I take the medicine after meals.", es: "Tomo la medicina después de comer." },
+      { ja: "{家|いえ}で{野菜|やさい}を{食|た}べます。", en: "I eat vegetables at home.", es: "Como verduras en casa." },
+    ],
   },
   {
     k: "飲", yomi: "のむ・イン",
@@ -206,57 +214,110 @@ const KANJI = [
   {
     k: "買", yomi: "かう・バイ",
     mean: { ja: "かう", en: "buy", es: "comprar" },
-    on: [ { yomi: "バイ", words: [] } ],
+    on: [
+      { yomi: "バイ", words: [
+        { w: "{売買|ばいばい}", en: "buying and selling", es: "compraventa" },
+      ] },
+    ],
     kun: [ { yomi: "かう", forms: "買[う]・買[います]" } ],
-    ex: [],
+    ex: [
+      { ja: "スーパーで{牛乳|ぎゅうにゅう}を{買|か}います。", en: "I buy milk at the supermarket.", es: "Compro leche en el supermercado." },
+      { ja: "{薬局|やっきょく}で{薬|くすり}を{買|か}いました。", en: "I bought medicine at the pharmacy.", es: "Compré medicina en la farmacia." },
+    ],
   },
   {
     k: "読", yomi: "よむ・ドク",
     mean: { ja: "よむ", en: "read", es: "leer" },
-    on: [ { yomi: "ドク", words: [] } ],
+    on: [
+      { yomi: "ドク", words: [
+        { w: "{読書|どくしょ}", en: "reading (books)", es: "lectura" },
+      ] },
+    ],
     kun: [ { yomi: "よむ", forms: "読[む]・読[みます]" } ],
-    ex: [],
+    ex: [
+      { ja: "{薬|くすり}の{説明|せつめい}を{読|よ}みます。", en: "I read the instructions for the medicine.", es: "Leo las instrucciones de la medicina." },
+      { ja: "{駅|えき}で{地図|ちず}を{読|よ}みます。", en: "I read the map at the station.", es: "Leo el mapa en la estación." },
+    ],
   },
   {
     k: "書", yomi: "かく・ショ",
     mean: { ja: "かく", en: "write", es: "escribir" },
-    on: [ { yomi: "ショ", words: [] } ],
+    on: [
+      { yomi: "ショ", words: [
+        { w: "{辞書|じしょ}", en: "dictionary", es: "diccionario" },
+        { w: "{教科書|きょうかしょ}", en: "textbook", es: "libro de texto" },
+      ] },
+    ],
     kun: [ { yomi: "かく", forms: "書[く]・書[きます]" } ],
-    ex: [],
+    ex: [
+      { ja: "{受付|うけつけ}で{名前|なまえ}を{書|か}きます。", en: "I write my name at the reception desk.", es: "Escribo mi nombre en la recepción." },
+      { ja: "{薬|くすり}の{袋|ふくろ}に{名前|なまえ}が{書|か}いてあります。", en: "The name is written on the medicine bag.", es: "El nombre está escrito en la bolsa de la medicina." },
+    ],
   },
   {
     k: "入", yomi: "はいる・ニュウ",
     mean: { ja: "はいる。いれる", en: "enter; put in", es: "entrar; meter" },
-    on: [ { yomi: "ニュウ", words: [] } ],
+    on: [
+      { yomi: "ニュウ", words: [
+        { w: "{入院|にゅういん}", en: "hospitalization", es: "hospitalización" },
+        { w: "{入学|にゅうがく}", en: "entering school", es: "ingreso a la escuela" },
+      ] },
+    ],
     kun: [
       { yomi: "はいる", forms: "入[る]・入[ります]" },
       { yomi: "いれる", forms: "入[れる]・入[れます]" },
     ],
-    ex: [],
+    ex: [
+      { ja: "{店|みせ}に{入|はい}ります。", en: "I go into the shop.", es: "Entro en la tienda." },
+      { ja: "{袋|ふくろ}に{野菜|やさい}を{入|い}れます。", en: "I put the vegetables in the bag.", es: "Meto las verduras en la bolsa." },
+    ],
   },
   {
     k: "出", yomi: "でる・シュツ",
     mean: { ja: "でる。だす", en: "go out; take out", es: "salir; sacar" },
-    on: [ { yomi: "シュツ", words: [] } ],
+    on: [
+      { yomi: "シュツ", words: [
+        { w: "{出発|しゅっぱつ}", en: "departure", es: "salida" },
+        { w: "{外出|がいしゅつ}", en: "going out", es: "salir (de casa)" },
+      ] },
+    ],
     kun: [
       { yomi: "でる", forms: "出[る]・出[ます]" },
       { yomi: "だす", forms: "出[す]・出[します]" },
     ],
-    ex: [],
+    ex: [
+      { ja: "{病院|びょういん}を{出|で}て、{薬局|やっきょく}に{行|い}きます。", en: "I leave the hospital and go to the pharmacy.", es: "Salgo del hospital y voy a la farmacia." },
+      { ja: "{受付|うけつけ}で{保険証|ほけんしょう}を{出|だ}します。", en: "I hand in my health insurance card at the reception desk.", es: "Entrego mi tarjeta del seguro médico en la recepción." },
+    ],
   },
   {
     k: "売", yomi: "うる・バイ",
     mean: { ja: "うる", en: "sell", es: "vender" },
-    on: [ { yomi: "バイ", words: [] } ],
+    on: [
+      { yomi: "バイ", words: [
+        { w: "{売店|ばいてん}", en: "kiosk; small shop", es: "quiosco; tienda pequeña" },
+        { w: "{販売|はんばい}", en: "sales", es: "venta" },
+      ] },
+    ],
     kun: [ { yomi: "うる", forms: "売[る]・売[ります]" } ],
-    ex: [],
+    ex: [
+      { ja: "この{店|みせ}は{野菜|やさい}を{売|う}っています。", en: "This shop sells vegetables.", es: "Esta tienda vende verduras." },
+      { ja: "{病院|びょういん}の{売店|ばいてん}で{水|みず}を{買|か}います。", en: "I buy water at the hospital kiosk.", es: "Compro agua en el quiosco del hospital." },
+    ],
   },
   {
     k: "住", yomi: "すむ・ジュウ",
     mean: { ja: "すむ", en: "live (in a place)", es: "vivir (en un lugar)" },
-    on: [ { yomi: "ジュウ", words: [] } ],
+    on: [
+      { yomi: "ジュウ", words: [
+        { w: "{住所|じゅうしょ}", en: "address", es: "dirección" },
+      ] },
+    ],
     kun: [ { yomi: "すむ", forms: "住[む]・住[みます]" } ],
-    ex: [],
+    ex: [
+      { ja: "{駅|えき}の{近|ちか}くに{住|す}んでいます。", en: "I live near the station.", es: "Vivo cerca de la estación." },
+      { ja: "{病院|びょういん}で{住所|じゅうしょ}を{書|か}きます。", en: "I write my address at the hospital.", es: "Escribo mi dirección en el hospital." },
+    ],
   },
 
   // ---------- 名詞 ----------
@@ -278,65 +339,139 @@ const KANJI = [
   {
     k: "院", yomi: "イン",
     mean: { ja: "おおきな たてもの(びょういん など)", en: "institution (hospital, etc.)", es: "institución (hospital, etc.)" },
-    on: [ { yomi: "イン", words: [] } ],
+    on: [
+      { yomi: "イン", words: [
+        { w: "{病院|びょういん}", en: "hospital", es: "hospital" },
+        { w: "{入院|にゅういん}", en: "hospitalization", es: "hospitalización" },
+      ] },
+    ],
     kun: [],
-    ex: [],
+    ex: [
+      { ja: "{病院|びょういん}は{何時|なんじ}からですか。", en: "What time does the hospital open?", es: "¿A qué hora abre el hospital?" },
+      { ja: "{父|ちち}は{来週|らいしゅう}まで{入院|にゅういん}します。", en: "My father will be in the hospital until next week.", es: "Mi padre estará en el hospital hasta la próxima semana." },
+    ],
   },
   {
     k: "薬", yomi: "くすり・ヤク",
     mean: { ja: "くすり", en: "medicine", es: "medicina" },
-    on: [ { yomi: "ヤク", words: [] } ],
+    on: [
+      { yomi: "ヤク", words: [
+        { w: "{薬局|やっきょく}", en: "pharmacy", es: "farmacia" },
+      ] },
+    ],
     kun: [ { yomi: "くすり", forms: "薬" } ],
-    ex: [],
+    ex: [
+      { ja: "{薬局|やっきょく}で{薬|くすり}をもらいます。", en: "I get my medicine at the pharmacy.", es: "Recibo mi medicina en la farmacia." },
+      { ja: "この{薬|くすり}は{一日|いちにち}{三回|さんかい}{飲|の}みます。", en: "I take this medicine three times a day.", es: "Tomo esta medicina tres veces al día." },
+    ],
   },
   {
     k: "店", yomi: "みせ・テン",
     mean: { ja: "みせ", en: "shop", es: "tienda" },
-    on: [ { yomi: "テン", words: [] } ],
+    on: [
+      { yomi: "テン", words: [
+        { w: "{店員|てんいん}", en: "shop clerk", es: "dependiente" },
+        { w: "{書店|しょてん}", en: "bookstore", es: "librería" },
+      ] },
+    ],
     kun: [ { yomi: "みせ", forms: "店" } ],
-    ex: [],
+    ex: [
+      { ja: "{店員|てんいん}さんに{聞|き}きます。", en: "I ask the shop clerk.", es: "Le pregunto al dependiente." },
+      { ja: "この{店|みせ}は{夜|よる}{九時|くじ}までです。", en: "This shop is open until 9 p.m.", es: "Esta tienda abre hasta las nueve de la noche." },
+    ],
   },
   {
     k: "家", yomi: "いえ・カ",
     mean: { ja: "いえ。うち", en: "house; home", es: "casa; hogar" },
-    on: [ { yomi: "カ", words: [] }, { yomi: "ケ", words: [] } ],
+    on: [
+      { yomi: "カ", words: [
+        { w: "{家族|かぞく}", en: "family", es: "familia" },
+        { w: "{家具|かぐ}", en: "furniture", es: "muebles" },
+      ] },
+      { yomi: "ケ", words: [
+        { w: "{田中家|たなかけ}", en: "the Tanaka family", es: "la familia Tanaka" },
+      ] },
+    ],
     kun: [ { yomi: "いえ", forms: "家" }, { yomi: "うち", forms: "家" } ],
-    ex: [],
+    ex: [
+      { ja: "{家|いえ}に{帰|かえ}って{休|やす}みます。", en: "I go home and rest.", es: "Vuelvo a casa y descanso." },
+      { ja: "{家族|かぞく}で{買|か}い{物|もの}に{行|い}きます。", en: "I go shopping with my family.", es: "Voy de compras con mi familia." },
+    ],
   },
   {
     k: "族", yomi: "ゾク",
     mean: { ja: "なかま。おなじ いえの ひと", en: "family; group", es: "familia; grupo" },
-    on: [ { yomi: "ゾク", words: [] } ],
+    on: [
+      { yomi: "ゾク", words: [
+        { w: "{家族|かぞく}", en: "family", es: "familia" },
+        { w: "{民族|みんぞく}", en: "ethnic group", es: "grupo étnico" },
+      ] },
+    ],
     kun: [],
-    ex: [],
+    ex: [
+      { ja: "{家族|かぞく}は{四人|よにん}です。", en: "There are four people in my family.", es: "Somos cuatro en mi familia." },
+      { ja: "{家族|かぞく}が{病院|びょういん}に{来|き}ました。", en: "My family came to the hospital.", es: "Mi familia vino al hospital." },
+    ],
   },
   {
     k: "学", yomi: "ガク・まなぶ",
     mean: { ja: "まなぶ。べんきょう", en: "learning; study", es: "aprendizaje; estudio" },
-    on: [ { yomi: "ガク", words: [] } ],
+    on: [
+      { yomi: "ガク", words: [
+        { w: "{学校|がっこう}", en: "school", es: "escuela" },
+        { w: "{大学|だいがく}", en: "university", es: "universidad" },
+      ] },
+    ],
     kun: [ { yomi: "まなぶ", forms: "学[ぶ]・学[びます]" } ],
-    ex: [],
+    ex: [
+      { ja: "{子|こ}どもを{学校|がっこう}に{送|おく}ります。", en: "I take my child to school.", es: "Llevo a mi hijo a la escuela." },
+      { ja: "{日本語|にほんご}を{学|まな}んでいます。", en: "I am learning Japanese.", es: "Estoy aprendiendo japonés." },
+    ],
   },
   {
     k: "校", yomi: "コウ",
     mean: { ja: "がっこう", en: "school", es: "escuela" },
-    on: [ { yomi: "コウ", words: [] } ],
+    on: [
+      { yomi: "コウ", words: [
+        { w: "{学校|がっこう}", en: "school", es: "escuela" },
+        { w: "{校長|こうちょう}", en: "principal", es: "director de la escuela" },
+      ] },
+    ],
     kun: [],
-    ex: [],
+    ex: [
+      { ja: "{学校|がっこう}から{電話|でんわ}がありました。", en: "I got a call from the school.", es: "Me llamaron de la escuela." },
+      { ja: "{学校|がっこう}の{前|まえ}に{店|みせ}があります。", en: "There is a shop in front of the school.", es: "Hay una tienda delante de la escuela." },
+    ],
   },
   {
     k: "野", yomi: "ヤ・の",
     mean: { ja: "のはら", en: "field", es: "campo" },
-    on: [ { yomi: "ヤ", words: [] } ],
+    on: [
+      { yomi: "ヤ", words: [
+        { w: "{野菜|やさい}", en: "vegetables", es: "verduras" },
+        { w: "{野球|やきゅう}", en: "baseball", es: "béisbol" },
+      ] },
+    ],
     kun: [ { yomi: "の", forms: "野" } ],
-    ex: [],
+    ex: [
+      { ja: "スーパーで{野菜|やさい}を{買|か}います。", en: "I buy vegetables at the supermarket.", es: "Compro verduras en el supermercado." },
+      { ja: "{毎日|まいにち}{野菜|やさい}を{食|た}べましょう。", en: "Let's eat vegetables every day.", es: "Comamos verduras todos los días." },
+    ],
   },
   {
     k: "菜", yomi: "サイ・な",
     mean: { ja: "やさい", en: "vegetable", es: "verdura" },
-    on: [ { yomi: "サイ", words: [] } ],
+    on: [
+      { yomi: "サイ", words: [
+        { w: "{野菜|やさい}", en: "vegetables", es: "verduras" },
+        { w: "{山菜|さんさい}", en: "wild mountain vegetables", es: "verduras silvestres de montaña" },
+      ] },
+    ],
     kun: [ { yomi: "な", forms: "菜" } ],
-    ex: [],
+    ex: [
+      { ja: "この{店|みせ}の{野菜|やさい}は{安|やす}いです。", en: "The vegetables at this shop are cheap.", es: "Las verduras de esta tienda son baratas." },
+      { ja: "{野菜|やさい}を{小|ちい}さく{切|き}ります。", en: "I cut the vegetables into small pieces.", es: "Corto las verduras en trozos pequeños." },
+    ],
   },
 ];
 
