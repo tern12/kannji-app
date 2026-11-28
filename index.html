@@ -52,6 +52,7 @@
   }
   .kanji-list .k { font-size: 32px; width: 60px; }
   .kanji-list .y { color: #555; }
+  .kanji-list .n { margin-left: auto; padding-left: 8px; font-size: 12px; color: #888; white-space: nowrap; } /* 画数 */
 
   .credit { margin-top: 20px; font-size: 12px; color: #777; line-height: 1.6; }
   .credit a { color: #777; }
@@ -80,6 +81,17 @@
   .controls { display: flex; gap: 8px; justify-content: center; margin: 12px 0 8px; }
   .controls button { min-width: 120px; padding: 10px 14px; border: 1px solid #999; background: none; border-radius: 8px; }
   #start-btn { background: #333; border-color: #333; color: #fff; } /* 濃いベタは「スタート(もう一度)」だけ */
+
+  /* 書き終わったら出る「次はこれ」 */
+  .related { margin-top: 12px; }
+  .related:not(.hidden) { animation: fade-in 0.3s ease-out; }
+  @keyframes fade-in { from { opacity: 0; transform: translateY(6px); } }
+  .related-title { margin-bottom: 6px; font-size: 14px; color: #777; text-align: center; }
+  .related-list { display: flex; gap: 8px; }
+  .related-list button { flex: 1; min-width: 0; padding: 8px 4px; border: 1px solid #999; background: none; border-radius: 8px; }
+  .related-list span { display: block; }
+  .related-list .rk { font-size: 28px; }
+  .related-list .rm { font-size: 12px; color: #666; line-height: 1.4; overflow-wrap: anywhere; }
 
   /* 読み・例文 */
   h2 { font-size: 16px; margin: 24px 0 8px; padding-bottom: 4px; border-bottom: 1px solid #ddd; }
@@ -162,6 +174,11 @@
   <div class="controls hidden" id="write-controls">
     <button id="model-btn"></button>
     <button id="clear-btn"></button>
+  </div>
+  <!-- 書き終わったら出る: 次はこれ(関連する字を3つ) -->
+  <div class="related hidden" id="related">
+    <div class="related-title" id="related-title"></div>
+    <div class="related-list" id="related-list"></div>
   </div>
 
   <h2 id="on-title"></h2>
@@ -668,10 +685,23 @@ const KANJI = [
   },
 ];
 
+// 関連する字のグループ(同じ場面の字)。書き終わったときの「次はこれ」で使う。
+// ここを直すと、出る字が変わる。1字が複数のグループに入ってもよい(KANJI にない字は無視する)
+const GROUPS = {
+  "病院":   "病院薬飲",
+  "買い物": "買売店野菜",
+  "食事":   "食飲野菜",
+  "学校":   "学校読書",
+  "公園":   "公園池鳥遊動場",
+  "家":     "家族住産",
+  "動き":   "行入出動軽",
+};
+
 // ボタンなどの文字(言語ごと)
 const UI = {
   ja: {
     back: "← 一覧", see: "見る", write: "書く",
+    strokes: "画", related: "次はこれ",
     start: "スタート", again: "もう一度", next: "次へ",
     hideModel: "見本を消す", showModel: "見本を出す", clear: "消す",
     meaning: "意味", reading: "読み",
@@ -681,6 +711,7 @@ const UI = {
   },
   en: {
     back: "← List", see: "Watch", write: "Write",
+    strokes: " strokes", related: "Next",
     start: "Start", again: "Again", next: "Next",
     hideModel: "Hide guide", showModel: "Show guide", clear: "Clear",
     meaning: "Meaning", reading: "Reading",
@@ -690,6 +721,7 @@ const UI = {
   },
   es: {
     back: "← Lista", see: "Ver", write: "Escribir",
+    strokes: " trazos", related: "Siguiente",
     start: "Empezar", again: "Otra vez", next: "Siguiente",
     hideModel: "Ocultar guía", showModel: "Mostrar guía", clear: "Borrar",
     meaning: "Significado", reading: "Lectura",
@@ -783,6 +815,11 @@ function goBack() {
 
 
 // ---------- 画面1: 一覧 ----------
+// 画数の少ない順(画数は STROKES の画の数)。同じ画数は KANJI の並びのまま
+function sortedKanji() {
+  return KANJI.slice().sort(function (a, b) { return STROKES[a.k].length - STROKES[b.k].length; });
+}
+
 function showList() {
   stopAnimation();
   cameFromList = false;
@@ -804,12 +841,13 @@ function renderList() {
     button.classList.toggle("active", button.dataset.lang === lang);
   });
 
-  // 漢字のリスト(左に漢字、右に読み)
+  // 漢字のリスト(左に漢字と読み、右に画数)
   let html = "";
-  for (const item of KANJI) {
+  for (const item of sortedKanji()) {
     html += '<li><button data-k="' + item.k + '">' +
               '<span class="k">' + item.k + '</span>' +
               '<span class="y">' + escapeHtml(item.yomi) + '</span>' +
+              '<span class="n">' + STROKES[item.k].length + UI[lang].strokes + '</span>' +
             '</button></li>';
   }
   $("kanji-list").innerHTML = html;
@@ -965,13 +1003,64 @@ function onPointerUp() {
   drawing = null;
   strokeCount++;   // 指を離したら1画
   updateModel();
+  if (strokeCount === STROKES[current.k].length) showRelated();  // 画数ぶん書き終わった
 }
 
-// 「消す」: 書いた線を消して1画目に戻る
+// 「消す」: 書いた線を消して1画目に戻る(別の字に移るときも、ここを通る)
 function clearInk() {
   drawing = null;
   strokeCount = 0;
   $("ink").innerHTML = "";
+  $("related").classList.add("hidden");
+}
+
+
+// ---------- 書き終わったら: 次はこれ ----------
+// 関連する字を3つ選ぶ。同じグループの中で、今の字の次から順に(最後まで行ったら先頭へ)。
+// 複数のグループに入る字は、グループから交互に1つずつ。3つに足りなければ、一覧で次の字で埋める
+function relatedKanji(k) {
+  const lists = Object.values(GROUPS)
+    .map(function (members) { return Array.from(members); })
+    .filter(function (members) { return members.includes(k); })
+    .map(function (members) {
+      const i = members.indexOf(k);
+      return members.slice(i + 1).concat(members.slice(0, i));
+    });
+
+  const picked = [];
+  function add(c) {
+    const item = KANJI.find(function (x) { return x.k === c; });
+    if (item && c !== k && picked.length < 3 && !picked.includes(item)) picked.push(item);
+  }
+
+  const longest = Math.max(0, ...lists.map(function (list) { return list.length; }));
+  for (let n = 0; n < longest; n++) {
+    for (const list of lists) add(list[n]);
+  }
+
+  const order = sortedKanji();
+  const at = order.findIndex(function (x) { return x.k === k; });
+  for (let n = 1; n < order.length; n++) add(order[(at + n) % order.length].k);
+
+  return picked;
+}
+
+// 意味を短くする(最初の「。」「;」「(」より前だけ)
+function shortMeaning(item) {
+  return item.mean[lang].split(/[。;(（]/)[0].trim();
+}
+
+function showRelated() {
+  $("related-title").textContent = UI[lang].related;
+  let html = "";
+  for (const item of relatedKanji(current.k)) {
+    html += '<button data-k="' + item.k + '">' +
+              '<span class="rk">' + item.k + '</span>' +
+              '<span class="rm">' + escapeHtml(shortMeaning(item)) + '</span>' +
+            '</button>';
+  }
+  $("related-list").innerHTML = html;
+  $("related").classList.remove("hidden");
 }
 
 
@@ -1058,6 +1147,11 @@ function start() {
   $("next-btn").addEventListener("click", function () { setMode("write"); });
   $("model-btn").addEventListener("click", function () { modelVisible = !modelVisible; updateModel(); });
   $("clear-btn").addEventListener("click", function () { clearInk(); updateModel(); });
+  // 「次はこれ」の字をタップしたら、その字の画面(見る)へ
+  $("related-list").addEventListener("click", function (e) {
+    const button = e.target.closest("button");
+    if (button) location.hash = encodeURIComponent(button.dataset.k);
+  });
 
   const frame = $("frame");
   frame.addEventListener("pointerdown", onPointerDown);
