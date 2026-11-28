@@ -28,12 +28,21 @@
   .hidden { display: none !important; }
   button { font: inherit; color: inherit; touch-action: manipulation; cursor: pointer; }
 
-  /* ===== 画面1: 一覧 ===== */
+  /* ===== はじめの画面: 言語を聞く ===== */
+  .lang-question { margin: 48px 0 28px; font-size: 18px; line-height: 2; text-align: center; }
+  .lang-question span { display: inline-block; } /* 折り返すときは、言語の区切りで */
+  .lang-choices { display: flex; flex-direction: column; gap: 12px; }
+  .lang-choices button { padding: 14px 0; border: 1px solid #999; background: none; border-radius: 8px; }
+
+  /* ===== 選んでいる印(言語・タブ): 下線。選んでいないほうは文字だけ ===== */
   .lang-switch, .tabs { display: flex; gap: 6px; margin-bottom: 12px; }
-  .lang-switch button, .tabs button {
-    flex: 1; padding: 10px 0; border: 1px solid #ccc; background: #fff; border-radius: 8px;
-  }
-  .lang-switch button.active, .tabs button.active { background: #333; color: #fff; border-color: #333; }
+  .lang-switch button, .tabs button { border: 0; border-bottom: 3px solid transparent; background: none; color: #777; }
+  .lang-switch button.active, .tabs button.active { color: #222; border-bottom-color: #333; }
+  .lang-switch { justify-content: flex-end; }          /* 一覧の言語ボタンは、右上に小さく */
+  .lang-switch button { padding: 6px 8px; font-size: 13px; }
+  .tabs button { flex: 1; padding: 10px 0; }
+
+  /* ===== 画面1: 一覧 ===== */
 
   .kanji-list { list-style: none; margin: 0; padding: 0; background: #fff; border: 1px solid #e3e3e3; border-radius: 8px; }
   .kanji-list li + li { border-top: 1px solid #eee; }
@@ -69,7 +78,8 @@
   #frame .ink-stroke { stroke: #2a62c9; }          /* 自分で書いた線 */
 
   .controls { display: flex; gap: 8px; justify-content: center; margin: 12px 0 8px; }
-  .controls button { min-width: 120px; padding: 10px 14px; border: 1px solid #ccc; background: #fff; border-radius: 8px; }
+  .controls button { min-width: 120px; padding: 10px 14px; border: 1px solid #999; background: none; border-radius: 8px; }
+  #start-btn { background: #333; border-color: #333; color: #fff; } /* 濃いベタは「スタート(もう一度)」だけ */
 
   /* 読み・例文 */
   h2 { font-size: 16px; margin: 24px 0 8px; padding-bottom: 4px; border-bottom: 1px solid #ddd; }
@@ -88,6 +98,20 @@
 </style>
 </head>
 <body>
+
+<!-- ===== はじめの画面: 言語を聞く(言語が保存されていないときだけ) ===== -->
+<div id="lang-screen" class="screen hidden">
+  <p class="lang-question">
+    <span lang="ja">何語を話しますか /</span>
+    <span lang="en">What language do you speak? /</span>
+    <span lang="es">¿Qué idioma hablas?</span>
+  </p>
+  <div class="lang-choices" id="lang-choices">
+    <button data-lang="ja">日本語</button>
+    <button data-lang="en">English</button>
+    <button data-lang="es">Español</button>
+  </div>
+</div>
 
 <!-- ===== 画面1: 一覧 ===== -->
 <div id="list-screen" class="screen">
@@ -569,12 +593,16 @@ function wait(ms) { return new Promise(function (resolve) { setTimeout(resolve, 
 
 // ---------- 言語 ----------
 // 前に選んだ言語があればそれ。なければスマホの言語(日本語/英語/スペイン語以外は日本語)
+let langChosen = false;  // 言語を選んだことがあるか。ないときは、一覧の前に言語を聞く
 let lang = loadLang();
 
 function loadLang() {
   try {
     const saved = localStorage.getItem("lang");
-    if (UI[saved]) return saved;
+    if (UI[saved]) {
+      langChosen = true;
+      return saved;
+    }
   } catch (e) { /* 保存できない環境でも動くように */ }
   const deviceLang = (navigator.language || "ja").slice(0, 2);
   return UI[deviceLang] ? deviceLang : "ja";
@@ -582,6 +610,7 @@ function loadLang() {
 
 function setLang(newLang) {
   lang = newLang;
+  langChosen = true;
   try { localStorage.setItem("lang", newLang); } catch (e) {}
   renderList();
 }
@@ -616,13 +645,19 @@ function showList() {
   stopAnimation();
   cameFromList = false;
   $("kanji-screen").classList.add("hidden");
-  $("list-screen").classList.remove("hidden");
+  // 言語をまだ選んでいないときは、一覧の代わりに言語を聞く画面を出す
+  $("lang-screen").classList.toggle("hidden", langChosen);
+  $("list-screen").classList.toggle("hidden", !langChosen);
+  if (!langChosen) {
+    window.scrollTo(0, 0);
+    return;
+  }
   renderList();
   window.scrollTo(0, listScrollY);
 }
 
 function renderList() {
-  // 言語のボタン: 選んでいるものを黒にする
+  // 言語のボタン: 選んでいるものに下線を付ける
   document.querySelectorAll("#lang-switch button").forEach(function (button) {
     button.classList.toggle("active", button.dataset.lang === lang);
   });
@@ -653,6 +688,7 @@ function showKanji(item) {
   } else {
     listScrollY = window.scrollY;
   }
+  $("lang-screen").classList.add("hidden");
   $("list-screen").classList.add("hidden");
   $("kanji-screen").classList.remove("hidden");
   window.scrollTo(0, 0);
@@ -856,6 +892,13 @@ function renderReadings(item) {
 
 // ---------- ボタンと指の動きをつなぐ ----------
 function start() {
+  // はじめの画面: 選んだ言語を保存して、一覧を出す
+  $("lang-choices").addEventListener("click", function (e) {
+    const button = e.target.closest("button");
+    if (!button) return;
+    setLang(button.dataset.lang);
+    showList();
+  });
   $("lang-switch").addEventListener("click", function (e) {
     const button = e.target.closest("button");
     if (button) setLang(button.dataset.lang);
